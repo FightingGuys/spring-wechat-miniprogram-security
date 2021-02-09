@@ -13,19 +13,19 @@
     <version>0.0.1</version>
     <name>spring-wechat-miniprogram-security</name>
     <description>微信小程序登录鉴权模块</description>
+    <url>https://github.com/fightingguys/spring-wechat-miniprogram-security</url>
 
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/</url>
-            <distribution>repo</distribution>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
     <scm>
         <url>https://github.com/fightingguys/spring-wechat-miniprogram-security</url>
-        <connection>https://github.com/fightingguys/spring-wechat-miniprogram-security</connection>
-        <developerConnection>https://github.com/fightingguys/spring-wechat-miniprogram-security.git</developerConnection>
+        <connection>scm:git:git://github.com/fightingguys/spring-wechat-miniprogram-security.git</connection>
+        <developerConnection>scm:git:ssh://github.com/fightingguys/spring-wechat-miniprogram-security.git</developerConnection>
     </scm>
 
     <developers>
@@ -40,6 +40,17 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
@@ -82,6 +93,17 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
