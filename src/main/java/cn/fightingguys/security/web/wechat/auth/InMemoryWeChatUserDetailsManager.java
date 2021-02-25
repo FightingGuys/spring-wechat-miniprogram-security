@@ -65,7 +65,8 @@ public class InMemoryWeChatUserDetailsManager implements UserDetailsManager {
         if (user == null) {
             throw new UsernameNotFoundException(openId);
         }
-        return new WeChatMiniProgramUserDetails(user.getOpenId(), user.getNickName(), user.isEnabled(), user.isAccountNonExpired(),
+        return new WeChatMiniProgramUserDetails(
+                user.getOpenId(), user.getNickName(), user.getUnionId(), user.getSessionKey(), user.isEnabled(), user.isAccountNonExpired(),
                 user.isCredentialsNonExpired(), user.isAccountNonLocked(), user.getAuthorities());
     }
 }

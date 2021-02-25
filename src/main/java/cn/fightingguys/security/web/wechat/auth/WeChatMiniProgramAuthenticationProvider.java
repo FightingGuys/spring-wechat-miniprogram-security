@@ -31,7 +31,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.client.RestTemplate;
 
@@ -116,9 +115,11 @@ public class WeChatMiniProgramAuthenticationProvider implements AuthenticationPr
         return builder.compact();
     }
 
-    private UserDetails createUser(String openId) {
+    private WeChatMiniProgramUserDetails createDefaultWeChatUser(String openId, String unionId, String sessionKey) {
         return WeChatMiniProgramUserDetails.builder()
                 .openId(openId)
+                .unionId(unionId)
+                .sessionKey(sessionKey)
                 .authorities(authoritiesName)
                 .build();
     }
@@ -130,37 +131,38 @@ public class WeChatMiniProgramAuthenticationProvider implements AuthenticationPr
         String url = String.format(JS_CODE_TO_SESSION_ENDPOINT, appId, appSecret, authentication.getCredentials());
         WeChatMiniProgramCode2Session code2Session = restTemplate.getForObject(url, WeChatMiniProgramCode2Session.class);
         checkCode2SessionService(code2Session);
-        String userOpenId = code2Session.getOpenId();
-        return createWeChatMiniProgramAuthenticationToken(userOpenId);
+        return createWeChatMiniProgramAuthenticationToken(code2Session);
     }
 
     private Authentication verifyAuthentication(WeChatMiniProgramAuthenticationToken authentication) {
         String jws = (String) authentication.getCredentials();
-        String userOpenId;
+        String openId;
         try {
-            userOpenId = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jws).getBody().getSubject();
+            openId = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jws).getBody().getSubject();
         } catch (JwtException e) {
             throw new AuthenticationServiceException(e.getMessage());
         }
-        return createWeChatMiniProgramAuthenticationToken(userOpenId, jws);
-    }
-
-    public Authentication createWeChatMiniProgramAuthenticationToken(String openId) {
-        String jws = createJwt(openId);
         return createWeChatMiniProgramAuthenticationToken(openId, jws);
     }
 
     private Authentication createWeChatMiniProgramAuthenticationToken(String openId, String jws) {
-        UserDetails userDetails;
+        return createWeChatMiniProgramAuthenticationToken(openId, null, null, jws);
+    }
+
+    private Authentication createWeChatMiniProgramAuthenticationToken(WeChatMiniProgramCode2Session code2Session) {
+        String openId = code2Session.getOpenId();
+        String jws = createJwt(openId);
+        return createWeChatMiniProgramAuthenticationToken(openId, code2Session.getUnionId(), code2Session.getSessionKey(), jws);
+    }
+
+    private Authentication createWeChatMiniProgramAuthenticationToken(String openId, String unionId, String sessionKey, String jws) {
+        WeChatMiniProgramUserDetails userDetails;
         if (!userDetailsManager.userExists(openId)) {
-            userDetails = createUser(openId);
+            userDetails = createDefaultWeChatUser(openId, unionId, sessionKey);
             userDetailsManager.createUser(userDetails);
         } else {
-            userDetails = userDetailsManager.loadUserByUsername(openId);
+            userDetails = (WeChatMiniProgramUserDetails) userDetailsManager.loadUserByUsername(openId);
         }
-        WeChatMiniProgramAuthenticationToken weChatMiniProgramAuthenticationToken =
-                new WeChatMiniProgramAuthenticationToken(jws, userDetails.getAuthorities());
-        weChatMiniProgramAuthenticationToken.setDetails(userDetails);
-        return weChatMiniProgramAuthenticationToken;
+        return new WeChatMiniProgramAuthenticationToken(jws, userDetails);
     }
 }

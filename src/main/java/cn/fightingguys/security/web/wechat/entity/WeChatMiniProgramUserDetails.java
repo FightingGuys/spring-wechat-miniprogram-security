@@ -26,26 +26,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 public class WeChatMiniProgramUserDetails implements UserDetails {
 
     private final String nickName;
     private final String openId;
+    private final String unionId;
+    private String sessionKey;
     private final boolean enabled;
     private final boolean accountNonExpired;
     private final boolean credentialsNonExpired;
     private final boolean accountNonLocked;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public WeChatMiniProgramUserDetails(String openId, String nickName, Collection<? extends GrantedAuthority> authorities) {
-        this(openId, nickName, true, true, true, true, authorities);
-    }
-
-    public WeChatMiniProgramUserDetails(String openId, String nickName, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        Assert.hasText(openId, "OpenId is Null");
+    public WeChatMiniProgramUserDetails(String openId, String nickName, String unionId, String sessionKey, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+        Assert.hasText(openId, "OpenId cannot be null");
         this.openId = openId;
         this.nickName = nickName;
+        this.unionId = unionId;
+        this.sessionKey = sessionKey;
         this.enabled = enabled;
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -55,6 +54,18 @@ public class WeChatMiniProgramUserDetails implements UserDetails {
 
     public String getNickName() {
         return nickName;
+    }
+
+    public String getUnionId() {
+        return unionId;
+    }
+
+    public String getSessionKey() {
+        return sessionKey;
+    }
+
+    public void setSessionKey(String sessionKey) {
+        this.sessionKey = sessionKey;
     }
 
     @Override
@@ -123,6 +134,10 @@ public class WeChatMiniProgramUserDetails implements UserDetails {
 
         private String nickname;
 
+        private String unionId;
+
+        private String sessionKey;
+
         private List<GrantedAuthority> authorities;
 
         private boolean accountExpired;
@@ -133,14 +148,22 @@ public class WeChatMiniProgramUserDetails implements UserDetails {
 
         private boolean disabled;
 
-        private Function<String, String> passwordEncoder = (password) -> password;
-
         private UserBuilder() {
         }
 
         public WeChatMiniProgramUserDetails.UserBuilder openId(String openId) {
             Assert.notNull(openId, "username cannot be null");
             this.openId = openId;
+            return this;
+        }
+
+        public WeChatMiniProgramUserDetails.UserBuilder unionId(String unionId) {
+            this.unionId = unionId;
+            return this;
+        }
+
+        public WeChatMiniProgramUserDetails.UserBuilder sessionKey(String sessionKey) {
+            this.sessionKey = sessionKey;
             return this;
         }
 
@@ -193,7 +216,7 @@ public class WeChatMiniProgramUserDetails implements UserDetails {
         }
 
         public WeChatMiniProgramUserDetails build() {
-            return new WeChatMiniProgramUserDetails(this.openId, this.nickname, !this.disabled, !this.accountExpired,
+            return new WeChatMiniProgramUserDetails(this.openId, this.nickname, this.unionId, this.sessionKey, !this.disabled, !this.accountExpired,
                     !this.credentialsExpired, !this.accountLocked, this.authorities);
         }
 

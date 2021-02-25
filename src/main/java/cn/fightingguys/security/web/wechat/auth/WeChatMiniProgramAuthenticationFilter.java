@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 微信小程序验证拦截器
+ * 微信小程序鉴权过滤器
  */
 public class WeChatMiniProgramAuthenticationFilter extends OncePerRequestFilter {
 
@@ -69,7 +69,7 @@ public class WeChatMiniProgramAuthenticationFilter extends OncePerRequestFilter 
             jsCode = (jsCode != null) ? jsCode : "";
 
             if (jsCode.length() == 0) {
-                sendErrorResponse(response, "The jsCode is null");
+                sendErrorResponse(response, "The jsCode cannot be null");
                 return;
             }
 

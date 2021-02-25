@@ -16,10 +16,8 @@
 
 package cn.fightingguys.security.web.wechat.auth;
 
+import cn.fightingguys.security.web.wechat.entity.WeChatMiniProgramUserDetails;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
 
 public class WeChatMiniProgramAuthenticationToken extends AbstractAuthenticationToken {
 
@@ -33,9 +31,10 @@ public class WeChatMiniProgramAuthenticationToken extends AbstractAuthentication
         this.verify = verify;
     }
 
-    public WeChatMiniProgramAuthenticationToken(String token, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
+    public WeChatMiniProgramAuthenticationToken(String token, WeChatMiniProgramUserDetails userDetails) {
+        super(userDetails.getAuthorities());
         this.credentials = token;
+        super.setDetails(userDetails);
         super.setAuthenticated(true);
     }
 
@@ -55,13 +54,6 @@ public class WeChatMiniProgramAuthenticationToken extends AbstractAuthentication
 
     @Override
     public Object getPrincipal() {
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return "WeChatMiniProgramAuthenticationToken{" +
-                "credentials='" + credentials + '\'' +
-                '}';
+        return super.getDetails();
     }
 }
