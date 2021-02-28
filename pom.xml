@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.fightingguys.security.web</groupId>
     <artifactId>spring-wechat-miniprogram-security</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <name>spring-wechat-miniprogram-security</name>
     <description>微信小程序登录鉴权模块</description>
     <url>https://github.com/fightingguys/spring-wechat-miniprogram-security</url>

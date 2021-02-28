@@ -162,6 +162,10 @@ public class WeChatMiniProgramAuthenticationProvider implements AuthenticationPr
             userDetailsManager.createUser(userDetails);
         } else {
             userDetails = (WeChatMiniProgramUserDetails) userDetailsManager.loadUserByUsername(openId);
+            if (sessionKey != null) {
+                userDetails.setSessionKey(sessionKey);
+            }
+            userDetailsManager.updateUser(userDetails);
         }
         return new WeChatMiniProgramAuthenticationToken(jws, userDetails);
     }
